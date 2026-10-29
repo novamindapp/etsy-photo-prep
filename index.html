@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etsy Listing Photo Prep — Resize &amp; Compress Photos to 2000px (Free, No Upload)</title>
+<meta name="description" content="Free Etsy listing photo tool: resize your real product photos to 2000px and compress them under 1MB, right in your browser. No account, no upload — your photos never leave your device.">
+<meta property="og:title" content="Etsy Listing Photo Prep — Free, No Upload">
+<meta property="og:description" content="Resize real Etsy listing photos to 2000px and under 1MB in your browser. No account. No upload.">
+<meta name="robots" content="index, follow">
+<style>
+  :root{--ink:#22201c;--muted:#6b655c;--line:#e4ded4;--bg:#faf8f4;--card:#ffffff;--accent:#b85c1e;--accent-d:#9a4a15;--ok:#1e7a3c;--warn:#9a6a00}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  header{max-width:860px;margin:0 auto;padding:28px 18px 8px}
+  h1{font-size:1.7rem;line-height:1.25;margin:0 0 8px}
+  header p{color:var(--muted);margin:0 0 4px}
+  main{max-width:860px;margin:0 auto;padding:12px 18px 40px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0}
+  #drop{border:2px dashed #c9bfae;border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;background:#fffdf9}
+  #drop.drag{border-color:var(--accent);background:#fdf3ea}
+  #drop strong{display:block;font-size:1.05rem}
+  #drop span{color:var(--muted);font-size:.92rem}
+  #fileInput{position:absolute;left:-9999px}
+  .row{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0}
+  .field{flex:1 1 180px}
+  label{display:block;font-weight:600;font-size:.92rem;margin-bottom:5px}
+  select,input[type=range]{width:100%}
+  select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:1rem}
+  .check{display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:.95rem}
+  .check input{margin-top:4px}
+  button{cursor:pointer;border:0;border-radius:9px;padding:12px 18px;font-size:1rem;font-weight:700}
+  #processBtn{background:var(--accent);color:#fff;width:100%}
+  #processBtn:hover{background:var(--accent-d)}
+  #processBtn:disabled{background:#c9bfae;cursor:not-allowed}
+  #downloadBtn{background:var(--ok);color:#fff;text-decoration:none;display:inline-block;text-align:center;padding:12px 18px;border-radius:9px;font-weight:700}
+  #downloadBtn[hidden]{display:none}
+  .previews{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.previews{grid-template-columns:1fr}}
+  .previews figure{margin:0}
+  .previews img{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#eee;display:block}
+  figcaption{font-size:.9rem;color:var(--muted);margin-top:6px}
+  .info{font-size:.95rem}
+  .info b{font-variant-numeric:tabular-nums}
+  .ok{color:var(--ok);font-weight:700}
+  .warn{color:var(--warn);font-weight:700}
+  .err{color:#a11;font-weight:600}
+  h2{font-size:1.15rem;margin:0 0 8px}
+  ul{margin:8px 0;padding-left:20px}
+  li{margin:4px 0}
+  .note{font-size:.92rem;color:var(--muted)}
+  footer{max-width:860px;margin:0 auto;padding:0 18px 30px;color:var(--muted);font-size:.88rem}
+  .steps{counter-reset:step;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+  @media(max-width:600px){.steps{grid-template-columns:1fr}}
+  .steps div{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+  .steps b{display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Etsy Listing Photo Prep</h1>
+  <p>Resize your real product photos to Etsy&rsquo;s listing size and compress them under 1MB — free, with no account, and no upload. Your photos are processed on your own device and never leave it.</p>
+</header>
+
+<main>
+  <div class="steps">
+    <div><b>1. Choose a photo</b>Pick a real photo of the actual item you are selling.</div>
+    <div><b>2. Pick the size</b>2000px is the recommended Etsy listing size.</div>
+    <div><b>3. Download</b>Save the ready photo and add it to your Etsy listing.</div>
+  </div>
+
+  <section class="card" aria-label="Photo tool">
+    <div id="drop" role="button" tabindex="0" aria-label="Choose a photo">
+      <strong>Drop a photo here, paste it, or click to choose one</strong>
+      <span>JPG, PNG, or WebP &middot; processed locally in your browser</span>
+    </div>
+    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+
+    <div class="row">
+      <div class="field">
+        <label for="preset">Output size</label>
+        <select id="preset">
+          <option value="long2000" selected>2000px on the longest side (recommended)</option>
+          <option value="square2000">Square crop, 2000 &times; 2000px</option>
+          <option value="long1600">1600px on the longest side</option>
+          <option value="original">Keep original size (compress only)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="format">Output format</label>
+        <select id="format">
+          <option value="image/jpeg" selected>JPEG (smallest, best for photos)</option>
+          <option value="image/webp">WebP (small, modern browsers)</option>
+          <option value="image/png">PNG (largest, keeps transparency)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="quality">JPEG / WebP quality: <span id="qualityVal">85</span>%</label>
+        <input type="range" id="quality" min="60" max="95" value="85">
+      </div>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="under1mb" checked> <span>Keep the file under 1MB (lowers quality automatically if needed)</span></label>
+      </div>
+    </div>
+
+    <p id="status" class="info" role="status">No photo chosen yet.</p>
+    <button id="processBtn" type="button" disabled>Prepare photo</button>
+
+    <div class="previews" id="previewWrap" hidden>
+      <figure>
+        <img id="previewOrig" alt="Original photo preview">
+        <figcaption id="origInfo"></figcaption>
+      </figure>
+      <figure>
+        <img id="previewOut" alt="Prepared photo preview">
+        <figcaption id="outInfo"></figcaption>
+      </figure>
+    </div>
+
+    <p style="margin-top:16px"><a id="downloadBtn" href="#" download hidden>Download prepared photo</a></p>
+    <p id="warnMsg" class="info"></p>
+  </section>
+
+  <!-- ADSTERRA: paste ad code here -->
+
+  <section class="card">
+    <h2>Etsy photo sizes, in plain terms</h2>
+    <ul>
+      <li><b>2000px on the longest side</b> is Etsy&rsquo;s recommended listing-photo size, so buyers can zoom in on the detail.</li>
+      <li><b>Under 1MB</b> keeps your listing fast to load. JPEG at 80–85% quality is usually enough for a sharp photo.</li>
+      <li><b>Use real photos of the actual item.</b> Etsy requires at least one photo that shows the real item as it is — this tool only resizes, crops, and compresses a real photo; it never creates or alters what is in the picture.</li>
+    </ul>
+    <p class="note">This tool is not affiliated with or endorsed by Etsy. Sizes and requirements can change; check Etsy&rsquo;s help pages for the current rules before you publish a listing.</p>
+  </section>
+
+  <section class="card">
+    <h2>Privacy</h2>
+    <p class="note">There is no account, no sign-up, and no upload. Your photo is read and resized by code running in your own browser. Nothing is sent to a server, and nothing is stored. Closing the page removes it.</p>
+  </section>
+</main>
+
+<footer>
+  <p>Etsy Listing Photo Prep — a free, single-purpose photo tool. Use real photos of real items only.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var drop = document.getElementById("drop");
+  var fileInput = document.getElementById("fileInput");
+  var presetEl = document.getElementById("preset");
+  var formatEl = document.getElementById("format");
+  var qualityEl = document.getElementById("quality");
+  var qualityVal = document.getElementById("qualityVal");
+  var under1mbEl = document.getElementById("under1mb");
+  var statusEl = document.getElementById("status");
+  var warnEl = document.getElementById("warnMsg");
+  var processBtn = document.getElementById("processBtn");
+  var downloadBtn = document.getElementById("downloadBtn");
+  var previewWrap = document.getElementById("previewWrap");
+  var previewOrig = document.getElementById("previewOrig");
+  var previewOut = document.getElementById("previewOut");
+  var origInfo = document.getElementById("origInfo");
+  var outInfo = document.getElementById("outInfo");
+
+  var img = null;        // loaded HTMLImageElement
+  var fileName = "";
+  var fileSize = 0;
+  var objectUrl = "";
+  var outUrl = "";
+
+  function kb(bytes) { return (bytes / 1024).toFixed(1) + " KB"; }
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  qualityEl.addEventListener("input", function () { qualityVal.textContent = qualityEl.value; });
+
+  function loadFile(file) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      setStatus("That file is not a JPG, PNG, or WebP photo. Please choose a photo file.");
+      return;
+    }
+    fileName = file.name || "photo";
+    fileSize = file.size;
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = URL.createObjectURL(file);
+    var next = new Image();
+    next.onload = function () {
+      img = next;
+      previewOrig.src = objectUrl;
+      origInfo.textContent = "Original: " + img.naturalWidth + " x " + img.naturalHeight + " px, " + kb(fileSize) + ".";
+      previewWrap.hidden = false;
+      processBtn.disabled = false;
+      downloadBtn.hidden = true;
+      previewOut.removeAttribute("src");
+      outInfo.textContent = "";
+      warnEl.textContent = "";
+      setStatus("Photo loaded. Choose the size and format, then press Prepare photo.");
+    };
+    next.onerror = function () { setStatus("That photo could not be read. Please try a different photo file."); };
+    next.src = objectUrl;
+  }
+
+  drop.addEventListener("click", function () { fileInput.click(); });
+  drop.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+  fileInput.addEventListener("change", function () { loadFile(fileInput.files[0]); });
+  ["dragenter", "dragover"].forEach(function (t) {
+    drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("drag"); });
+  });
+  ["dragleave", "drop"].forEach(function (t) {
+    drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove("drag"); });
+  });
+  drop.addEventListener("drop", function (e) { loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener("paste", function (e) {
+    var items = (e.clipboardData || {}).items || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image/") === 0) { loadFile(items[i].getAsFile()); break; }
+    }
+  });
+
+  function targetSize(w, h, preset) {
+    if (preset === "square2000") return { w: 2000, h: 2000, crop: true };
+    var maxSide = preset === "long1600" ? 1600 : 2000;
+    if (preset === "original") return { w: w, h: h, crop: false };
+    if (Math.max(w, h) <= maxSide) return { w: w, h: h, crop: false };
+    var s = maxSide / Math.max(w, h);
+    return { w: Math.round(w * s), h: Math.round(h * s), crop: false };
+  }
+
+  function draw(tw, th, crop) {
+    var c = document.createElement("canvas");
+    c.width = tw; c.height = th;
+    var ctx = c.getContext("2d");
+    if (formatEl.value === "image/jpeg") { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, tw, th); }
+    if (crop) {
+      var side = Math.min(img.naturalWidth, img.naturalHeight);
+      var sx = (img.naturalWidth - side) / 2, sy = (img.naturalHeight - side) / 2;
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, tw, th);
+    } else {
+      ctx.drawImage(img, 0, 0, tw, th);
+    }
+    return c;
+  }
+
+  function toBlob(canvas, mime, q) {
+    return new Promise(function (resolve) { canvas.toBlob(resolve, mime, q); });
+  }
+
+  function extFor(mime) { return mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg"; }
+  function baseName(name) { return name.replace(/\.[^.]+$/, "") || "photo"; }
+
+  async function process() {
+    if (!img) return;
+    processBtn.disabled = true;
+    setStatus("Preparing your photo…");
+    warnEl.textContent = "";
+    try {
+      var preset = presetEl.value;
+      var mime = formatEl.value;
+      var keepUnder = under1mbEl.checked;
+      var quality = parseInt(qualityEl.value, 10) / 100;
+      var t = targetSize(img.naturalWidth, img.naturalHeight, preset);
+      var canvas = draw(t.w, t.h, t.crop);
+      var blob = await toBlob(canvas, mime, quality);
+
+      // If still over 1MB, lower quality step by step (JPEG/WebP only).
+      if (keepUnder && blob && blob.size > 1048576 && mime !== "image/png") {
+        var q = quality;
+        while (blob.size > 1048576 && q > 0.5) {
+          q = Math.max(0.5, q - 0.1);
+          blob = await toBlob(canvas, mime, q);
+        }
+      }
+      if (!blob) { setStatus("The photo could not be prepared in this browser. Please try a different browser."); return; }
+
+      if (outUrl) URL.revokeObjectURL(outUrl);
+      outUrl = URL.createObjectURL(blob);
+      previewOut.src = outUrl;
+      var over = blob.size > 1048576;
+      outInfo.innerHTML = "Prepared: <b>" + t.w + " x " + t.h + " px, " + kb(blob.size) + "</b>, " + extFor(mime).toUpperCase() +
+        (over ? ' — <span class="warn">over 1MB</span>' : ' — <span class="ok">under 1MB</span>');
+      downloadBtn.href = outUrl;
+      downloadBtn.download = baseName(fileName) + "-etsy-" + t.w + "x" + t.h + "." + extFor(mime);
+      downloadBtn.hidden = false;
+      if (over && mime === "image/png") {
+        warnEl.textContent = "This PNG is still over 1MB. PNG files stay large — switch to JPEG or WebP for a smaller file at the same size.";
+      } else if (over) {
+        warnEl.textContent = "This photo is still over 1MB at the lowest quality used here. Try the 1600px size, or JPEG instead of WebP.";
+      }
+      setStatus("Done. Download the prepared photo and add it to your Etsy listing.");
+    } catch (err) {
+      setStatus("Something went wrong preparing the photo. Please try again with a different photo.");
+    } finally {
+      processBtn.disabled = false;
+    }
+  }
+
+  processBtn.addEventListener("click", process);
+})();
+</script>
+</body>
+</html>
